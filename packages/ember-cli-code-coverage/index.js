@@ -75,6 +75,10 @@ module.exports = {
     this._super.included.apply(this, arguments);
     let config = app.options[this.name] || {};
     this.modifyAssetLocation = config && config.modifyAssetLocation;
+
+    if (process.env[config.coverageEnvVar || 'COVERAGE'] === 'true') {
+      this._setupPreprocessorRegistry(this.app.registry, '**/*.hbs');
+    }
   },
 
   buildNamespaceMappings() {
@@ -143,5 +147,23 @@ module.exports = {
       return this.serverMiddleware({ app }, config);
     }
     attachMiddleware.testMiddleware(app, config);
+  },
+
+  _setupPreprocessorRegistry(registry, include, exclude) {
+
+    const buildTemplateInstrumenter = require('./lib/template-instrumenter');
+    let TemplateInstrumenter = buildTemplateInstrumenter(
+      this.parent.root,
+      this.registry.extensionsForType('template'),
+      include,
+      exclude
+    );
+
+    registry.add('htmlbars-ast-plugin', {
+      name: "template-instrumenter",
+      plugin: TemplateInstrumenter,
+      baseDir() { return __dirname; },
+      cacheKey() { return 'template-instrumenter'; },
+    });
   },
 };
