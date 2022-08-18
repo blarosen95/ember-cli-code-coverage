@@ -83,10 +83,10 @@ module.exports = function(appRoot, templateExtensions, include, exclude) {
 
     handleStatement(node) {
       // cannot process named-blocks (temporary fix, may discover something better but, for now, this allows it to build):
-      if (node.children && node.children.some((child) => child.tag.startsWith(':'))) {
+      if (node.children && node.children.some((child) => !!child.tag || child.tag.startsWith(':'))) {
         return;
       }
-      
+
       if (node.isCoverageHelper) { return; }
 
       if (node.type === 'TextNode' && node.chars.trim() === '') {
