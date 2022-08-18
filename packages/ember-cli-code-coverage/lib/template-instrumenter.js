@@ -244,12 +244,26 @@ module.exports = function(appRoot, templateExtensions, include, exclude) {
         },
         AttrNode: {
           enter: (node) => {
+            if (node.children && node.children.some((child) => child.tag?.startsWith(':'))) {
+              return;
+            }
+            // return if tag is undefined:
+            if (!node.tag) {
+              return;
+            }
             if (node.value && node.value.type === 'TextNode') {
               return;
             }
             this._containerStack.push(node);
           },
           exit: (node) => {
+            if (node.children && node.children.some((child) => child.tag?.startsWith(':'))) {
+              return;
+            }
+            // return if tag is undefined:
+            if (!node.tag) {
+              return;
+            }
             if (node.value && node.value.type === 'TextNode') {
               return;
             }
