@@ -86,6 +86,10 @@ module.exports = function(appRoot, templateExtensions, include, exclude) {
       if (node.children && node.children.some((child) => child.tag?.startsWith(':'))) {
         return;
       }
+      // return if tag is undefined:
+      if (!node.tag) {
+        return;
+      }
 
       if (!node?.tag) {
         return;
@@ -127,6 +131,14 @@ module.exports = function(appRoot, templateExtensions, include, exclude) {
     }
     
     handleBlock(node) {
+      // cannot process named-blocks (temporary fix, may discover something better but, for now, this allows it to build):
+      if (node.children && node.children.some((child) => child.tag?.startsWith(':'))) {
+        return;
+      }
+      // return if tag is undefined:
+      if (!node.tag) {
+        return;
+      }
       // cannot process blocks without a loc
       if (!node.loc) {
         return;
@@ -177,6 +189,13 @@ module.exports = function(appRoot, templateExtensions, include, exclude) {
 
       let handleBlock = {
         enter: (node) => {
+          //! Check children and their children, and prevent handling the block if matching:
+          if (node.children && node.children.some((child) => child.tag?.startsWith(':'))) {
+            return;
+          }
+          // if (node.children && node.children.some((child) => child.children && child.children.some((grandchild) => grandchild.tag?.startsWith(':')))) {
+          //   return;
+          // }
           this.handleBlock(node);
           this._containerStack.push(node);
         },
